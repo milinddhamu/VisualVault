@@ -13,7 +13,7 @@ const AppRouter = () => {
         <Routes>
           <Route exact path="/" element={<App />} />
           <Route path="/favorites" element={<Favorites />} />
-          <Route element={<NotFound />} />
+          <Route path="*" element={<NotFound />} /> 
         </Routes>
         <ToastContainer
           position="bottom-right"
