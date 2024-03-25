@@ -40,7 +40,7 @@ Follow these steps to set up and run the project:
 - React
 - Redux
 - Axios
-- Tailwind CSS (or mention the UI library chosen)
+- Tailwind CSS
 - ESLint for linting
 - Vite for development server and build tool
 
