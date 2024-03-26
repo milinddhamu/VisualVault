@@ -13,7 +13,7 @@ import EditModal from "./EditModal";
 function ImageComponent({
       image,
       isFullSize,
-      onImageClick,
+      onImageClick
     }) {
   const favoritesList = useSelector(state => state.favorites);
   const [isModelOpen, setIsModelOpen] = useState(false);
@@ -48,17 +48,15 @@ function ImageComponent({
   return (
     <>
     <div className={`relative group ${isFullSize ? 'dark-background mx-auto max-w-screen-lg' : ''} `}>
-      <a
-        className={`${!isFullSize ? "hidden group-hover:flex" : "flex text-base"} hover:underline absolute top-0 m-1 mx-2 text-xs font-bold gap-1 items-center z-10 ${location.pathname === "/favorites" && "mt-10"}`}
+      <h1
+        className={`${!isFullSize ? "hidden group-hover:flex" : "flex text-base"} absolute top-0 m-1 mx-2 text-xs font-bold gap-1 items-center mt-10`}
         href={image.url}
-        target="_blank"
-        rel="noopener noreferrer" 
         id={image.url}
         title={image.photographer}
         >
       <BsCamera2 className={`text-base  ${isFullSize && "mt-1"}`} />
       {image.photographer}
-      </a>
+      </h1>
           <img 
           src={image.src.large} 
           alt={image?.alt || image.photographer} 
@@ -85,19 +83,16 @@ function ImageComponent({
           <span className="text-xs bg-gray-200 text-black rounded-md px-2 mt-2">close</span>}
         
           </div>
-
-        {location.pathname === "/favorites" && 
           <button 
-          className="absolute top-0 left-0 m-2 bg-white text-black p-1 rounded-md hover:bg-gray-400"
+          className="absolute top-0 left-0 m-2 bg-white text-black p-1 rounded-md hover:text-violet-600 hover:bg-gray-200 transition-all"
           onClick={()=> setIsModelOpen(!isModelOpen)}
           >
             <AiFillEdit />
-            </button>}
+            </button>
 
       </div>
-        {location.pathname === "/favorites" &&
-        (isModelOpen &&
-          <EditModal image={image} setIsModelOpen={setIsModelOpen} />)}      
+        {isModelOpen &&
+          <EditModal image={image} setIsModelOpen={setIsModelOpen} />}      
     </>
   );
 }
