@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import ImagesGrid from './components/ImagesGrid';
-import { useSelector } from 'react-redux';
+import { useSelector,useDispatch } from 'react-redux';
+import { appendImages, setImages } from './redux/slice/indexSlice'
 
 function App() {
-  const [data, setData] = useState([]); // Initializing empty array ,To access prevData without null error.
   const [loading, setLoading] = useState(false); // Loading state for data fetching.
   const [page, setPage] = useState(1); // State for pagination.
   const inputString = useSelector(state => state.input); // Extracting data from Input state of Navbar search.
+  const imagesArray = useSelector(state => state.index); // Extracting data from Index slice
+  const dispatch = useDispatch();
+
   const url = inputString.trim().length === 0 
-    ? `https://api.pexels.com/v1/curated?per_page=20&page=${page}`
+    ? `https://api.pexels.com/v1/curated?per_page=10&page=${page}`
     : `https://api.pexels.com/v1/search?query=${encodeURIComponent(inputString)}&per_page=20&page=${page}`; // Two endpoints for fetching random or search images.
 
-  const fetchImages = useCallback(async (page) => {
+  const fetchImages = useCallback(async () => {
     if (loading) return;
     setLoading(true);
     try {
@@ -22,21 +25,15 @@ function App() {
         }
       });
       const data = response?.data;
-      setData((prevData) => [...prevData, ...data.photos]);
+      // setData((prevData) => [...prevData, ...data.photos]);
+      dispatch(appendImages(data?.photos))
       setLoading(false);
     } catch (error) {
       console.error('Error:', error);
     }
   }, [loading,inputString]); // Using useCallback here to cache the function if loading or input string state doesnt change.
 
-  useEffect(() => {
-    fetchImages(page);
-  }, [page,inputString]); // To call the function whenever page & input string data gets updated.
   
-  useEffect(() => {
-      setData((prev)=>[]);
-  }, [inputString]); // Clear the data state when the inputString changes to switch between search and random images
-
   const observer = useRef(); // Creating a ref
   const lastImageElementRef = useCallback(node => {
     if (loading) return;
@@ -47,13 +44,20 @@ function App() {
       }
     })
     if (node) observer.current.observe(node); // setting to observe the node when its rendered.
-
-  }, [loading,data]); // Used useCallback here to cache the fn and run it only when loading is changed so it doesnt fetch data again and again when user is at bottom of the page.
-
+    
+  }, [loading,imagesArray]); // Used useCallback here to cache the fn and run it only when loading is changed so it doesnt fetch data again and again when user is at bottom of the page. passing data here doesnt make much of sense as its taking its memory path and comparing to new memory path
+  
+  useEffect(() => {
+    fetchImages(page);
+  }, [page,inputString]); // To call the function whenever page & input string data gets updated.
+  
+  useEffect(() => {
+      dispatch(setImages([]));
+  }, [inputString]); // Clear the data state when the inputString changes to switch between search and random images
   return (
     <div className='flex flex-col w-full items-center relative'>
-      {(data.length !== 0) && <ImagesGrid imagesArray={data} />}
-      {(data.length === 0 && loading) && "Loading...."}
+      {(imagesArray.length !== 0) && <ImagesGrid imagesArray={imagesArray} />}
+      {(imagesArray.length === 0 && loading) && "Loading...."}
       <div ref={lastImageElementRef} className='h-10'></div> {/* Displaying an element at last for pagination */}
     </div>
   );

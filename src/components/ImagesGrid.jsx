@@ -2,7 +2,7 @@ import ImageComponent from "./ImageComponent";
 import { useState } from "react";
 import { useLocation } from 'react-router-dom';
 
-function ImagesGrid({imagesArray}) {
+function ImagesGrid({imagesArray,setData}) {
   const [isFullSize, setIsFullSize] = useState(null);
   const [fullSizeImageId, setFullSizeImageId] = useState(null);
 
@@ -44,7 +44,8 @@ function ImagesGrid({imagesArray}) {
         image={image} 
         isFullSize={isFullSize && image.id === fullSizeImageId} 
         onImageClick={() => handleImageClick(image.id)}
-        handleImageClick={handleImageClick} 
+        handleImageClick={handleImageClick}
+        setData={setData} 
       />
     </div>
   );
