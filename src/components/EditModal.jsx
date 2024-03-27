@@ -1,9 +1,8 @@
-import React from 'react'
+/* eslint-disable react/prop-types */
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateFavorite } from '../redux/slice/favoritesSlice';
 import { toast } from 'react-toastify';
-import validator from 'validator';
 import { IoCloseSharp } from "react-icons/io5";
 import { useLocation } from 'react-router-dom';
 import { updateImage } from '../redux/slice/indexSlice';
@@ -14,8 +13,8 @@ function EditModal({image,setIsModelOpen}) {
   const currentPath = location.pathname;
   // Initializing state as per Image data
   const [editData, setEditData] = useState({
-    photographer:image.photographer,
-    alt:image.alt,
+    title:image.title,
+    description:image.description,
     url:image.url
   });
 
@@ -35,7 +34,7 @@ function EditModal({image,setIsModelOpen}) {
       if(currentPath === "/"){
         dispatch(updateImage({ id: image.id, ...editData }));
         setIsModelOpen(false);
-        toast(`${image.id} updated successfully`)
+        toast(`Image with ID: ${image.id} updated successfully`)
       } else if(currentPath === "/favorites"){ 
           dispatch(updateFavorite({ id: image.id, ...editData }));
           setIsModelOpen(false);
@@ -60,15 +59,15 @@ function EditModal({image,setIsModelOpen}) {
               <div className='border-b w-full'>
               </div>
               <span className='flex flex-col w-full gap-2  '>
-              <p className='place-self-start text-sm text-gray-400'>Photographer's name :</p>
+              <p className='place-self-start text-sm text-gray-400'>Title :</p>
               <input 
                 className="focus:outline-none p-2 w-full bg-stone-900" 
-                value={editData.photographer || ""}
-                onChange={handleChange('photographer')}
+                value={editData.title || ""}
+                onChange={handleChange('title')}
                 />
                 </span>
               <span className='flex flex-col w-full gap-2  '>
-              <p className='place-self-start text-sm text-gray-400'>Photographer's link :</p>
+              <p className='place-self-start text-sm text-gray-400'>Url :</p>
               <textarea 
                 className={`focus:outline-none p-2 w-full ${urlRegexTest ? "text-green-500" : "text-red-500"} bg-stone-900`} 
                 value={editData.url || ""}
@@ -79,8 +78,8 @@ function EditModal({image,setIsModelOpen}) {
               <p className='place-self-start text-sm text-gray-400'>Description :</p>
               <textarea 
                 className="focus:outline-none p-2 w-full bg-stone-900"
-                value={editData.alt || ""}
-                onChange={handleChange('alt')}
+                value={editData.description || ""}
+                onChange={handleChange('description')}
                 />
                 </span>
               <span className="flex flex-row gap-2">
@@ -100,6 +99,8 @@ function EditModal({image,setIsModelOpen}) {
             </span>
             <button 
               className='absolute top-0 right-0 m-4'
+              title="close"
+              id="close"
               onClick={handleCloseModal}
               >
              <IoCloseSharp className='hover:text-violet-500 text-lg' /> 

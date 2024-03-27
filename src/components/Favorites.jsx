@@ -6,21 +6,31 @@ export default function Favorites() {
   const favoritesList = useSelector(state => state.favorites);
   const [favoriteImagesList,setFavoriteImagesList] = useState(favoritesList); // Initalizing state with favorites redux state
   const [sortList,setSortList] = useState(false);
-
+  const inputString = useSelector(state => state.input)
+  const [filteredFavoriteList, setFilteredFavoriteList] = useState([]);
   useEffect(() => {
-    const sortedList = [...favoritesList].sort((a, b) => {
-      const nameA = a.photographer.toUpperCase();
-      const nameB = b.photographer.toUpperCase();
-      if (nameA < nameB) {
-        return sortList ? -1 : 1;
-      }
-      if (nameA > nameB) {
-        return sortList ? 1 : -1;
-      }
-      return 0;
-    });
+    const sortArray = (array) => {
+      return [...array].sort((a, b) => {
+        const nameA = a.title.toUpperCase();
+        const nameB = b.title.toUpperCase();
+        if (nameA < nameB) {
+          return sortList ? -1 : 1;
+        }
+        if (nameA > nameB) {
+          return sortList ? 1 : -1;
+        }
+        return 0;
+      });
+    };
+  
+    const sortedList = sortArray(favoritesList);
     setFavoriteImagesList(sortedList);
-  }, [favoritesList, sortList]);
+  
+    const filteredList = sortedList.filter(image => 
+      !inputString || image.title.toLowerCase().includes(inputString.toLowerCase())
+    );
+    setFilteredFavoriteList(filteredList);
+  }, [favoritesList, sortList, inputString]);
 
   if(favoritesList.length === 0){
     return <div className='flex w-full h-dvh justify-center items-center'>No favorite items.</div>
@@ -41,7 +51,8 @@ export default function Favorites() {
         }
         </button>
       </div>
-    <ImagesGrid imagesArray={favoriteImagesList} />
+    <ImagesGrid imagesArray={inputString ? filteredFavoriteList:favoriteImagesList} />
+    {(inputString && filteredFavoriteList.length === 0) && <div>No item found for &quot;{inputString}&quot;</div>}
     </div>
   )
 }

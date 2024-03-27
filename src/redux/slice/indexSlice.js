@@ -1,24 +1,26 @@
 // favoritesSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = [];
+const initialState = { page: 1, data: [] };
 
 const indexSlice = createSlice({
   name: 'index',
   initialState,
   reducers: {
+    incrementPage: (state) => { state.page += 1; },
+    resetPage: (state) => { state.page = 1;state.data = []; },
     setImages: (state, action) => {
-      return action.payload;
+      state.data = action.payload;
     },
     appendImages: (state, action) => {
-      return [...state, ...action.payload];
+      state.data = [...state.data, ...action.payload];
     },
     updateImage: (state, action) => {
-      const { id, photographer, alt, url } = action.payload;
-      return state.map(item => item.id === id ? { ...item, photographer, alt, url } : item);
+      const { id, title, description, url } = action.payload;
+      state.data = state.data.map(item => item.id === id ? { ...item, title, description, url } : item);
     },
   }
 });
 
-export const { setImages, appendImages, updateImage } = indexSlice.actions;
+export const { incrementPage,resetPage,setImages, appendImages, updateImage } = indexSlice.actions;
 export default indexSlice.reducer;
