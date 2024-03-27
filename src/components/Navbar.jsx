@@ -22,8 +22,7 @@ function Navbar() {
       <div className='flex flex-row w-full gap-2'>
         <input 
           placeholder={isIndexPage ? 'Search photos..' : 'Search my photos..'}
-          className={`flex w-full p-4 focus:outline-none bg-black ${isfavoritesPage && "cursor-not-allowed"}`}
-          disabled={isfavoritesPage}
+          className={`flex w-full p-4 focus:outline-none bg-black`}
           onChange={handleInputChange}
           value={inputString}
           />

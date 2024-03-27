@@ -1,30 +1,18 @@
+/* eslint-disable react/prop-types */
+
 import ImageComponent from "./ImageComponent";
 import { useState } from "react";
-import { useLocation } from 'react-router-dom';
+import { useAutoAnimate } from '@formkit/auto-animate/react'
+
 
 function ImagesGrid({imagesArray,setData}) {
   const [isFullSize, setIsFullSize] = useState(null);
   const [fullSizeImageId, setFullSizeImageId] = useState(null);
+  const [animationParent] = useAutoAnimate();
 
   if (!imagesArray) {
     return <div>Loading...</div>;
   }
-
-  // Remove duplicates
-  const seen = new Set();
-  const uniqueImagesArray = imagesArray.filter(el => {
-    const duplicate = seen.has(el.id);
-    seen.add(el.id);
-    return !duplicate;
-  });
-
-  // Dividing into 4 parts to map 4 uniform columns for layout rather than grid for maintaining image ratio
-
-  const quarterLength = Math.ceil(uniqueImagesArray.length / 4);
-  const part1 = uniqueImagesArray.slice(0, quarterLength);
-  const part2 = uniqueImagesArray.slice(quarterLength, quarterLength * 2);
-  const part3 = uniqueImagesArray.slice(quarterLength * 2, quarterLength * 3);
-  const part4 = uniqueImagesArray.slice(quarterLength * 3, uniqueImagesArray.length);
 
   // Function for resizing per Image based on Id so only one image gets resized at a time
   const handleImageClick = (id) => {
@@ -54,29 +42,8 @@ function ImagesGrid({imagesArray,setData}) {
     <>
     <div className='flex flex-row justify-center w-full '>
       <div className='flex flex-row max-w-screen-lg w-full'>
-        <div className="flex flex-row gap-1 w-full">
-
-          
-          <div className="flex flex-col md:flex-row gap-1 w-full">
-            <div className="flex flex-col gap-1 w-full">
-              {part1.map((image,index)=>renderImageComponent(image, index, 1))}
-            </div>
-            <div className="flex flex-col gap-1 w-full">
-            {part2.map((image,index)=>renderImageComponent(image, index, 2))}
-            </div>
-          </div>
-          
-          
-          <div className="flex flex-col md:flex-row gap-1 w-full">
-            <div className="flex flex-col gap-1 w-full">
-            {part3.map((image,index)=>renderImageComponent(image, index, 3))}
-            </div>
-            <div className="flex flex-col gap-1 w-full">
-            {part4.map((image,index)=>renderImageComponent(image, index, 4))}
-            </div>
-          </div>
-
-          
+        <div ref={animationParent} className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4  gap-1 w-full">
+        {imagesArray.map((image,index)=>renderImageComponent(image, index, 1))}        
         </div>
       </div>
     </div>

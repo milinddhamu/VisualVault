@@ -5,13 +5,17 @@ import { Provider } from 'react-redux'
 import store from './redux/store.js';
 import { BrowserRouter } from 'react-router-dom';
 import AppRouter from './routes/AppRouter';
+import { ApolloProviderWrapper } from './apollo/ApolloProviderWrapper';
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
+    <ApolloProviderWrapper>
+      <Provider store={store}>
+        <BrowserRouter>
           <AppRouter />
-      </BrowserRouter>
-    </Provider>
+        </BrowserRouter>
+      </Provider>
+    </ApolloProviderWrapper>
   </React.StrictMode>,
 )

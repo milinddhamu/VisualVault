@@ -1,64 +1,58 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
+/* eslint-disable react/prop-types */
+
+import { useState, useRef, useCallback } from 'react';
 import ImagesGrid from './components/ImagesGrid';
 import { useSelector,useDispatch } from 'react-redux';
-import { appendImages, setImages } from './redux/slice/indexSlice'
+import { incrementPage,appendImages } from './redux/slice/indexSlice'
+import { useQuery } from "@apollo/client";
+import { GET_IMAGES } from './gql/queries/getImages';
 
 function App() {
-  const [loading, setLoading] = useState(false); // Loading state for data fetching.
-  const [page, setPage] = useState(1); // State for pagination.
-  const inputString = useSelector(state => state.input); // Extracting data from Input state of Navbar search.
-  const imagesArray = useSelector(state => state.index); // Extracting data from Index slice
+  const limit = 10;
   const dispatch = useDispatch();
+  const inputString = useSelector(state => state.input); // Extracting data from Input state of Navbar search.
+  const {page,data:imagesArray} = useSelector(state => state.index); // Extracting data from Index slice
+  const {error,loading} = useQuery(GET_IMAGES,{ variables :{
+    "limit": `${limit}`,
+    "offset" : `${(page-1)*limit}`
+  },
+  onCompleted:(response)=>dispatch(appendImages(response.slingacademyQuery.photos)),
+  onError:(e)=> console.log(`[ERROR]:${e}`)
 
-  const url = inputString.trim().length === 0 
-    ? `https://api.pexels.com/v1/curated?per_page=10&page=${page}`
-    : `https://api.pexels.com/v1/search?query=${encodeURIComponent(inputString)}&per_page=20&page=${page}`; // Two endpoints for fetching random or search images.
-
-  const fetchImages = useCallback(async () => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const response = await axios.get(url, {
-        headers: {
-          'Authorization': import.meta.env.VITE_API_KEY
-        }
-      });
-      const data = response?.data;
-      // setData((prevData) => [...prevData, ...data.photos]);
-      dispatch(appendImages(data?.photos))
-      setLoading(false);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }, [loading,inputString]); // Using useCallback here to cache the function if loading or input string state doesnt change.
-
+  });
   
+  const filteredImagesArray = imagesArray.filter(image => image.title.toLowerCase().includes(inputString.toLowerCase()));
+  console.log(loading,page,imagesArray)
+
   const observer = useRef(); // Creating a ref
   const lastImageElementRef = useCallback(node => {
     if (loading) return;
+    if(page === 14) return;
     if (observer.current) observer.current.disconnect(); // if observer is already set somewhere then disconnect it.
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting) {
-        setPage(prevPage => prevPage + 1); // Incrementing as per previous state when the ref element intersecting the view (or gets in view.)
+          dispatch(incrementPage()) // Incrementing as per previous state when the ref element intersecting the view (or gets in view.)
+          // setIsDataLoaded(false); // Reset the flag as we're fetching new data
       }
     })
     if (node) observer.current.observe(node); // setting to observe the node when its rendered.
     
-  }, [loading,imagesArray]); // Used useCallback here to cache the fn and run it only when loading is changed so it doesnt fetch data again and again when user is at bottom of the page. passing data here doesnt make much of sense as its taking its memory path and comparing to new memory path
-  
-  useEffect(() => {
-    fetchImages(page);
-  }, [page,inputString]); // To call the function whenever page & input string data gets updated.
-  
-  useEffect(() => {
-      dispatch(setImages([]));
-  }, [inputString]); // Clear the data state when the inputString changes to switch between search and random images
+  }, [loading]); // Used useCallback here to cache the fn and run it only when loading is changed so it doesnt fetch data again and again when user is at bottom of the page. passing data here doesnt make much of sense as its taking its memory path and comparing to new memory path
   return (
     <div className='flex flex-col w-full items-center relative'>
-      {(imagesArray.length !== 0) && <ImagesGrid imagesArray={imagesArray} />}
+
+      {(imagesArray.length !== 0) && <ImagesGrid imagesArray={inputString ? filteredImagesArray : imagesArray} />}
+
+      {(imagesArray.length !== 0 && inputString && filteredImagesArray.length === 0) && 
+      `No results found for "${inputString}"`}
+
       {(imagesArray.length === 0 && loading) && "Loading...."}
-      <div ref={lastImageElementRef} className='h-10'></div> {/* Displaying an element at last for pagination */}
+
+      {error && `${error}`}
+
+      {!inputString &&
+      <div ref={lastImageElementRef} className='h-10'></div>} {/* Displaying an element at last for pagination */}
+
     </div>
   );
 }

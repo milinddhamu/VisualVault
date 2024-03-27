@@ -14,8 +14,8 @@ const favoritesSlice = createSlice({
       return state.filter(item => item.id !== action.payload);
     },
     updateFavorite: (state, action) => {
-      const { id, photographer, alt, url } = action.payload;
-      return state.map(item => item.id === id ? { ...item, photographer, alt, url } : item);
+      const { id, title, description, url } = action.payload;
+      return state.map(item => item.id === id ? { ...item, title, description, url } : item);
     },
   }
 });
