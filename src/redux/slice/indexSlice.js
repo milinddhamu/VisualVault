@@ -13,7 +13,12 @@ const indexSlice = createSlice({
       state.data = action.payload;
     },
     appendImages: (state, action) => {
-      state.data = [...state.data, ...action.payload];
+      const newImages = action.payload;
+      newImages.forEach(newImage => {
+        if (!state.data.some(image => image.id === newImage.id)) {
+          state.data.push(newImage);
+        }
+      });
     },
     updateImage: (state, action) => {
       const { id, title, description, url } = action.payload;

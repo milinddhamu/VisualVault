@@ -25,25 +25,26 @@ function ImagesGrid({imagesArray,setData}) {
     }
   };
 
-  // Function to render Image component for reusability
-  const renderImageComponent = (image, index, column) => (
-    <div key={`Col-${column}--${index}--${image.id}`}>
-      <ImageComponent 
-        image={image} 
-        isFullSize={isFullSize && image.id === fullSizeImageId} 
-        onImageClick={() => handleImageClick(image.id)}
-        handleImageClick={handleImageClick}
-        setData={setData} 
-      />
-    </div>
-  );
 
   return (
     <>
     <div className='flex flex-row justify-center w-full '>
       <div className='flex flex-row max-w-screen-lg w-full'>
-        <div ref={animationParent} className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4  gap-1 w-full">
-        {imagesArray.map((image,index)=>renderImageComponent(image, index, 1))}        
+        <div 
+          ref={animationParent} 
+          id="Images-grid"
+          className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4  gap-1 w-full">
+        {imagesArray.map((image,index)=>(
+          <div key={`Col--${index}--${image.id}`}>
+            <ImageComponent 
+              image={image} 
+              isFullSize={isFullSize && image.id === fullSizeImageId} 
+              onImageClick={() => handleImageClick(image.id)}
+              handleImageClick={handleImageClick}
+              setData={setData} 
+            />
+        </div>
+        ))}        
         </div>
       </div>
     </div>

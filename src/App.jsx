@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 
-import { useState, useRef, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import ImagesGrid from './components/ImagesGrid';
 import { useSelector,useDispatch } from 'react-redux';
 import { incrementPage,appendImages } from './redux/slice/indexSlice'
 import { useQuery } from "@apollo/client";
 import { GET_IMAGES } from './gql/queries/getImages';
+import { AiOutlineLoading } from "react-icons/ai";
 
 function App() {
   const limit = 10;
@@ -22,7 +23,6 @@ function App() {
   });
   
   const filteredImagesArray = imagesArray.filter(image => image.title.toLowerCase().includes(inputString.toLowerCase()));
-  console.log(loading,page,imagesArray)
 
   const observer = useRef(); // Creating a ref
   const lastImageElementRef = useCallback(node => {
@@ -32,7 +32,6 @@ function App() {
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting) {
           dispatch(incrementPage()) // Incrementing as per previous state when the ref element intersecting the view (or gets in view.)
-          // setIsDataLoaded(false); // Reset the flag as we're fetching new data
       }
     })
     if (node) observer.current.observe(node); // setting to observe the node when its rendered.
@@ -46,12 +45,14 @@ function App() {
       {(imagesArray.length !== 0 && inputString && filteredImagesArray.length === 0) && 
       `No results found for "${inputString}"`}
 
-      {(imagesArray.length === 0 && loading) && "Loading...."}
+      {(imagesArray.length === 0 && loading) && "Fetching images...."}
 
       {error && `${error}`}
 
-      {!inputString &&
-      <div ref={lastImageElementRef} className='h-10'></div>} {/* Displaying an element at last for pagination */}
+      {(!inputString && imagesArray.length <= 131 ) &&
+      <div ref={lastImageElementRef} className='flex justify-center items-center w-full h-10'>
+      <AiOutlineLoading className='animate-spin text-xl' />
+      </div>} {/* Displaying an element at last for pagination */}
 
     </div>
   );
